@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OPINIO — Sign In / Sign Up</title>
+<style>
+  :root{
+    --sky-500: #0edee9;
+    --sky-200: #cef4fc;
+    --card-bg: #ffffff;
+    --muted: #6b7e80;
+    --rounded: 14px;
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  }
+  body{
+    margin:0;
+    min-height:100vh;
+    background: linear-gradient(180deg,var(--sky-200), #f3fbff 40%);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .wrap{ width:720px; max-width:92%; }
+
+  header{ text-align:center; margin-bottom:26px; }
+  .logo{ display:flex; align-items:center; gap:12px; justify-content:center; }
+  .logo .icon{
+    width:70px; height:70px; border-radius:14px;
+    background: linear-gradient(135deg,#02dff3,#079af6);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: 0 6px 18px rgba(93, 123, 137, 0.482);
+    font-weight:700; color:#fff; font-size:26px;
+  }
+
+  h1{
+    margin:10px 0 0;
+    font-size:52px;
+    font-weight:900;
+    background: linear-gradient(270deg,#01a1c2,#02fdec,#01659b,#04a7b0);
+    background-size:400% 400%;
+    background-clip:text;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation: gradientMove 6s ease infinite;
+  }
+  @keyframes gradientMove {
+    0%{background-position:0% 50%;}
+    100%{background-position:100% 50%;}
+  }
+
+  .subtitle{ color:var(--muted); margin-top:8px; font-size:18px; }
+
+  .card{
+    background:var(--card-bg);
+    border-radius:var(--rounded);
+    padding:28px;
+    box-shadow: 0 10px 30px rgba(2,6,23,0.06);
+  }
+  .tabs{
+    display:flex; gap:8px; background:#eef6f8; padding:8px; border-radius:10px;
+  }
+  .tab{
+    flex:1; text-align:center; padding:10px 6px; border-radius:8px; cursor:pointer; color:#0b556f;
+    font-weight:600; user-select:none;
+  }
+  .tab.active{ background: linear-gradient(90deg,var(--sky-500), #34b7e6); color:white; }
+
+  label{ display:block; margin:18px 0 8px; color:#222; font-weight:600; font-size:14px; }
+  input[type="password"], input[type="text"]{
+    width:100%; padding:14px 16px; border-radius:10px; border:1px solid #e6eef0;
+    background:#f5fbfd; outline:none; box-sizing:border-box; font-size:14px;
+  }
+
+  .btn{
+    display:block; width:100%; padding:14px; border-radius:12px; border:none; cursor:pointer;
+    font-weight:700; margin-top:18px; font-size:16px; transition: all 0.3s ease;
+  }
+  .btn.primary{
+    background: linear-gradient(90deg,var(--sky-500), #34b7e6); color:white;
+    box-shadow: 0 8px 20px rgba(14,165,233,0.16);
+  }
+  .btn.primary:hover{ transform: scale(1.05); }
+  .note{ text-align:center; margin-top:12px; color:var(--muted); font-size:13px; }
+
+  footer{ text-align:center; margin-top:22px; color:var(--muted); font-size:15px; }
+
+  /* ===== New Choice Page Styles ===== */
+  #choicePage{
+    display:none;
+    text-align:center;
+    animation: fadeIn 0.6s ease forwards;
+  }
+  @keyframes fadeIn{ from{opacity:0; transform:scale(0.95);} to{opacity:1; transform:scale(1);} }
+
+  .choice-card{
+    background:white;
+    border-radius:18px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.997);
+    padding:60px 70px;
+    width:600px;
+    margin:auto;
+  }
+  .choice-heading{
+    font-size:38px;
+    font-weight:800;
+    margin-bottom:25px;
+    background:linear-gradient(90deg,#0179bf,#23236c,#00c9ff,#015677);
+    background-size:300% 300%;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation: moveGrad 5s linear infinite;
+  }
+  @keyframes moveGrad{
+    0%{background-position:0% 50%;}
+    100%{background-position:100% 50%;}
+  }
+
+  .choice-btn{
+    display:block;
+    width:100%;
+    background:linear-gradient(135deg,#aff2ff,#01daea);
+    color:rgb(1, 32, 82);
+    padding:18px;
+    margin:19px 0;
+    border:none;
+    border-radius:12px;
+    font-size:24px;
+    font-weight:660;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.997);
+    transition: all 0.3s ease;
+    cursor:pointer;
+  }
+  .choice-btn:hover{
+    transform:translateY(-4px);
+    box-shadow:0 6px 16px rgba(0, 174, 255, 0.4);
+  }
+</style>
+</head>
+<body>
+  <div class="wrap" id="mainPage">
+    <header>
+      <div class="logo">
+        <div class="icon">OP</div>
+        <div>
+          <h1>OPINIO</h1>
+          <div class="subtitle">Student Feedback Management App</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="card" id="authCard">
+      <div class="tabs">
+        <div class="tab active" id="tabSignIn">Sign In</div>
+        <div class="tab" id="tabSignUp">Sign Up</div>
+      </div>
+
+      <form id="authForm" onsubmit="return false" style="margin-top:14px;">
+        <div id="nameRow" style="display:none;">
+          <label for="name">Full Name</label>
+          <input id="name" type="text" placeholder="Enter your full name" />
+        </div>
+
+        <label for="loginId">Login ID</label>
+        <input id="loginId" type="text" placeholder="Enter unique login ID (any text allowed)" required />
+
+        <label for="pass">Password</label>
+        <input id="pass" type="password" placeholder="Create password (min 6 characters)" required />
+
+        <div id="adminRow" style="display:none;">
+          <label for="adminPass">Admin Password</label>
+          <input id="adminPass" type="password" placeholder="Create admin password (optional)" />
+        </div>
+
+        <button class="btn primary" id="authBtn">Sign In</button>
+        <div class="note">By continuing, you agree to use OPINIO app responsibly.</div>
+      </form>
+    </div>
+
+    <footer>
+      <div style="margin-top:18px; font-weight:700; color:#0b556f;">OPINIO - Student Feedback Management App</div>
+      <div style="margin-top:6px; color:var(--muted)">© Syed Numan Pasha</div>
+    </footer>
+  </div>
+
+  <!-- ===== Choice Page ===== -->
+  <div id="choicePage">
+    <div class="choice-card">
+      <div class="choice-heading">OPINIO - Student Feedback Management App</div>
+      <button class="choice-btn" onclick="window.location.href='index.html'">Student Login</button>
+      <button class="choice-btn" onclick="window.location.href='admin.html'">Admin Login</button>
+    </div>
+  </div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCWAu5JS9tMSCVJI0bjHRoXUkxBRcTy6oI",
+    authDomain: "sfm-feedback-system.firebaseapp.com",
+    projectId: "sfm-feedback-system",
+    storageBucket: "sfm-feedback-system.firebasestorage.app",
+    messagingSenderId: "803809181569",
+    appId: "1:803809181569:web:5514c62285e2bb5af6b280",
+    measurementId: "G-D0FG04711S"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  const tabSignIn = document.getElementById('tabSignIn');
+  const tabSignUp = document.getElementById('tabSignUp');
+  const nameRow = document.getElementById('nameRow');
+  const adminRow = document.getElementById('adminRow');
+  const authBtn = document.getElementById('authBtn');
+  let mode = 'signin';
+
+  tabSignIn.addEventListener('click', ()=>{
+    mode='signin';
+    tabSignIn.classList.add('active');
+    tabSignUp.classList.remove('active');
+    nameRow.style.display='none';
+    adminRow.style.display='none';
+    authBtn.textContent='Sign In';
+  });
+  tabSignUp.addEventListener('click', ()=>{
+    mode='signup';
+    tabSignUp.classList.add('active');
+    tabSignIn.classList.remove('active');
+    nameRow.style.display='block';
+    adminRow.style.display='block';
+    authBtn.textContent='Sign Up';
+  });
+
+  document.getElementById('authForm').addEventListener('submit', async ()=>{
+    const loginId = document.getElementById('loginId').value.trim();
+    const pass  = document.getElementById('pass').value.trim();
+    const name  = document.getElementById('name').value.trim();
+    const adminPass = document.getElementById('adminPass').value.trim();
+
+    if(pass.length < 6){ alert('Password must be at least 6 characters'); return; }
+
+    // Create fake email internally (no @ needed from user)
+    const fakeEmail = loginId.replace(/\s+/g, "_") + "@opinio.local";
+
+    try {
+      if(mode === 'signup'){
+        const cred = await createUserWithEmailAndPassword(auth, fakeEmail, pass);
+        await setDoc(doc(db, "users", cred.user.uid, "profile", "info"), {
+          name: name || loginId,
+          loginId: loginId,
+          password: pass,
+          adminPassword: adminPass
+        });
+        showChoicePage();
+      } else {
+        await signInWithEmailAndPassword(auth, fakeEmail, pass);
+        showChoicePage();
+      }
+    } catch (err) {
+      console.error(err);
+      alert(err.message);
+    }
+  });
+
+  authBtn.addEventListener('click', ()=> document.getElementById('authForm').dispatchEvent(new Event('submit')));
+
+  function showChoicePage(){
+    document.getElementById('mainPage').style.display='none';
+    document.getElementById('choicePage').style.display='block';
+  }
+</script>
+</body>
+</html>

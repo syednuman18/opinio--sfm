@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ADMIN PANEL - STUDENT FEEDBACK MANAGEMENT SYSTEM</title>
+
+<!-- PWA / manifest & icons -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2285ff">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- icons -->
+<link rel="icon" href="icon/icon-192.png" sizes="192x192">
+<link rel="apple-touch-icon" href="icon/icon-512.png">
+
+<!-- iOS -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="mobile-web-app-capable" content="yes">
+
+<style>
+/* Prevent input zoom on Android keyboard */
+input, select, textarea {
+  font-size: 16px; /* at least 16px stops auto zoom */
+}
+
+
+/* ===== Modern Gradient Background and Font ===== */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Poppins", "Segoe UI", sans-serif;
+  background: linear-gradient(90deg, #cdf1fe, #c3fdec);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  color: #212121;
+}
+
+/* ===== Login Container ===== */
+.container {
+  width: 850px;
+  background: linear-gradient(90deg, #f6fcd4, #e6ffef);
+  padding: 90px 55px;
+  border-radius: 25px;
+  box-shadow: 0 23px 38px rgba(5, 5, 5, 0.981);
+  text-align: center;
+  animation: fadeIn 0.8s ease;
+}
+
+@keyframes fadeIn {
+  from {opacity: 0; transform: translateY(-15px);}
+  to {opacity: 1; transform: translateY(0);}
+}
+
+/* ===== Heading Styles ===== */
+h2 {
+  font-size: 62px;
+  color: #010523;
+  margin-bottom: 50px;
+  font-weight: 850;
+}
+h2::before {
+  content: "🔐 ";
+}
+
+/* ===== Input Styles ===== */
+input[type="password"] {
+  width: 80%;
+  padding: 26px;
+  font-size: 19px;
+  border: 4.2px solid #050505;
+  border-radius: 18px;
+  outline: none;
+  margin-top: 15px;
+  transition: border 0.3s;
+}
+input[type="password"]:focus {
+  border-color: #1d04db;
+}
+
+/* ===== Button Styles ===== */
+.btn {
+  width: 60%;
+  margin-top: 18px;
+  padding: 22px;
+  border: none;
+  border-radius: 18px;
+  box-shadow: 0 13px 22px rgb(5, 5, 5);
+  font-size: 22px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 750;
+}
+
+.login-btn {
+  background: linear-gradient(135deg, #c4ff5e, #96fad3);
+  color: #0a0a0a;
+  margin-top: 75px;
+}
+.login-btn:hover {
+  transform:translateY(-5px);
+}
+
+.back-btn {
+  background: #3b4b49;
+  color: #f7f2f2;
+  margin-top: 68px;
+}
+.back-btn:hover {
+  transform:translateY(-4px);
+}
+
+/* ===== Admin Panel Page ===== */
+#adminPanel {
+  display: none;
+  width: 100%;
+  height: auto;
+  padding: 40px 20px;
+}
+
+.table-container {
+  max-width: 1100px;
+  margin: 40px auto;
+  background: #f5fde2;
+  border: 3.3px solid #eeeeee;
+  border-radius: 22px;
+  padding: 34px;
+  box-shadow: 0 20px 35px rgba(0, 0, 0, 0.984);
+}
+
+.table-container h2 {
+  font-size: 50px;
+  font-weight: 750;
+  color: #0c1a27;
+  text-align: center;
+  background: none;
+  margin-bottom: 60px;
+}
+.table-container h2::before {
+  content: "🧾 ";
+}
+
+.gradient-text {
+  background: linear-gradient(45deg, #000, #303030, #08017d, #d70680, #cb1313, #0d0872, #99048f, #cb036a, #333333, #000);
+  background-size: 400% 400%;
+  background-clip: text;             /* ✅ standard property added */
+  -webkit-background-clip: text;     /* ✅ for Chrome, Edge, Safari */
+  -webkit-text-fill-color: transparent;
+  animation: gradientFlow 5s ease infinite;
+}
+
+@keyframes gradientFlow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+
+/* ===== Table ===== */
+.table-scroll {
+  max-height: 1090px;
+  overflow-y: auto;
+  margin-top: 25px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 20px;
+}
+table th, table td {
+  border: 2px solid #0c0e20;
+  padding: 12px;
+}
+table th {
+  background-color: #0dfc71;
+  color: white;
+  text-align: center;
+  top: 0;
+}
+.student-box {
+  border: 4.4px solid #0b0e1f;
+  border-radius: 22px;
+  margin-bottom: 25px;
+  padding: 14px;
+  background: #fff;
+  position: relative;
+  transition: transform 0.2s;
+}
+
+h3 {
+  font-size: 30px;
+  color: #111a24;
+  margin-bottom: 10px;
+}
+
+/* ===== Buttons in Admin Panel ===== */
+.reset-btn {
+  background: #fb0202;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 14px 20px rgb(5, 5, 5);
+  padding: 19px 35px;
+  cursor: pointer;
+  font-size: 24px;
+  font-weight: 650;
+  transition: background 0.3s;
+}
+.reset-btn:hover { transform: translateY(-4px);
+background: #dc3d3d; }
+
+.export-btn {
+  background: #2ecc71;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 14px 20px rgb(5, 5, 5);
+  padding: 19px 35px;
+  cursor: pointer;
+  font-size: 24px;
+  font-weight: 650;
+  margin-left: 30px;
+  margin-top: 5px;
+  margin-bottom: 40px;
+  transition: background 0.3s;
+}
+.export-btn:hover { background: #06f96b;
+transform: translateY(-4px); }
+
+.delete-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: #fb1b02;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  box-shadow: 0 4px 8px rgb(5, 5, 5);
+  padding: 10px 18px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.delete-btn:hover { transform: translateY(-2px);
+background: #e35e52; }
+
+/* ===== Modal Styles ===== */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+.modal-box {
+  background: #fff;
+  padding: 35px;
+  border-radius: 16px;
+  text-align: center;
+  max-width: 380px;
+  box-shadow: 0 15px 20px rgba(0, 0, 0, 0.984);
+}
+.modal-box p {
+  font-size: 25px;
+  margin-bottom: 20px;
+  color: #333;
+}
+.modal-btn {
+  padding: 16px 24px;
+  border: none;
+  border-radius: 10px;
+  font-size: 18px;
+  cursor: pointer;
+  margin: 0 10px;
+  font-weight: 650;
+}
+.modal-yes {
+  background: #080808;
+  color: rgb(239, 8, 8);
+}
+.modal-no {
+  background: #050505;
+  color: rgb(88, 250, 18);
+}
+
+/* Scrollbar Style */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: #bbb;
+  border-radius: 6px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+</style>
+</head>
+
+<body>
+<div id="loginPage" class="container">
+  <h2><span class="gradient-text">Admin Login</span></h2>
+  <input type="password" id="adminPassword" placeholder="Enter admin password">
+  <button class="btn login-btn" id="loginBtn">🔑 Admin Login</button>
+  <button class="btn back-btn" id="backBtn">← Back</button>
+  <button class="btn back-btn" id="signOutBtn">Sign Out</button>
+
+</div>
+
+<div id="adminPanel" style="display:none;">
+  <div class="table-container">
+    <h2><span class="gradient-text">Admin Panel — (Submitted Feedbacks)<p>  </p></span></h2>
+    <div style="text-align:center; margin-bottom:10px;">
+      <button class="reset-btn" id="resetAllBtn">🗑 RESET-[Delete all]</button>
+      <button class="export-btn" id="manageBtn" class="btn">⚙ Manage Subjects &amp; Faculties</button>
+      <button class="export-btn" id="exportBtn">❎ Copy to Excel</button>
+      <!-- ✅ New Button Added Below -->
+      <button class="export-btn" id="viewResultsBtn" onclick="window.location.href='result.html'">📊 VIEW FEEDBACK RESULTS</button>
+
+<script>
+document.getElementById("manageBtn").addEventListener("click", ()=>{
+  window.location.href = "manage.html";
+});
+</script>
+    </div>
+    <div class="table-scroll" id="feedbackContainer"></div>
+    <div style="text-align:center;">
+      <button class="btn back-btn" id="panelBackBtn">← Back</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="confirmModal" class="modal-overlay">
+  <div class="modal-box">
+    <p id="confirmMessage"></p>
+    <button id="yesBtn" class="modal-btn modal-yes">Yes</button>
+    <button id="noBtn" class="modal-btn modal-no">No</button>
+  </div>
+</div>
+
+<!-- SheetJS Library -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+<!-- Keep all your JS as is -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";                           
+import { getFirestore, collection, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";  
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";  
+
+const firebaseConfig = {  
+  apiKey: "AIzaSyCWAu5JS9tMSCVJI0bjHRoXUkxBRcTy6oI",  
+  authDomain: "sfm-feedback-system.firebaseapp.com",  
+  projectId: "sfm-feedback-system",  
+  storageBucket: "sfm-feedback-system.firebasestorage.app",  
+  messagingSenderId: "803809181569",  
+  appId: "1:803809181569:web:5514c62285e2bb5af6b280",  
+  measurementId: "G-D0FG04711S"  
+};  
+
+
+const app = initializeApp(firebaseConfig);  
+getAnalytics(app);  
+const db = getFirestore(app); 
+
+import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+const auth = getAuth();
+document.getElementById('signOutBtn').addEventListener('click', async ()=>{
+  await signOut(auth);
+  window.location.href = 'signup.html';
+});
+
+
+document.addEventListener('DOMContentLoaded', () => {  
+  const loginPage = document.getElementById('loginPage');  
+  const adminPanel = document.getElementById('adminPanel');  
+  const feedbackContainer = document.getElementById('feedbackContainer');  
+  const modal = document.getElementById('confirmModal');  
+  const confirmMsg = document.getElementById('confirmMessage');  
+  const yesBtn = document.getElementById('yesBtn');  
+  const noBtn = document.getElementById('noBtn');  
+  let confirmCallback = null;  
+
+  function showConfirm(message, callback){
+    confirmMsg.textContent = message;
+    confirmCallback = callback;
+    modal.style.display = 'flex';
+  }
+
+  yesBtn.onclick = () => { 
+    modal.style.display = 'none'; 
+    if(confirmCallback) confirmCallback(true); 
+  };
+  noBtn.onclick = () => { 
+    modal.style.display = 'none'; 
+    if(confirmCallback) confirmCallback(false); 
+  };
+
+  document.getElementById('loginBtn').addEventListener('click', () => {  
+    const password = document.getElementById('adminPassword').value;  
+    if(password === 'admin@18*'){  
+      loginPage.style.display = 'none';  
+      adminPanel.style.display = 'block';  
+      loadFeedback();  
+    } else {  
+      alert('Incorrect Password!');  
+    }  
+  });  
+
+  document.getElementById('backBtn').addEventListener('click', () => { window.location.href='./index.html'; });  
+  document.getElementById('panelBackBtn').addEventListener('click', () => {  
+    adminPanel.style.display='none';  
+    loginPage.style.display='flex';  
+    document.getElementById('adminPassword').value='';  
+  });  
+
+  document.getElementById('resetAllBtn').addEventListener('click', () => {
+    showConfirm("Are you sure you want to reset (delete all feedbacks)?", async (yes)=>{
+      if(yes){
+        const querySnapshot = await getDocs(collection(db,"feedbacks"));
+        for(const fbDoc of querySnapshot.docs){
+          await deleteDoc(doc(db,"feedbacks",fbDoc.id));
+        }
+        loadFeedback();
+        alert('All feedbacks deleted!');
+      }
+    });
+  });
+
+  
+
+  // ---------- Export to Excel (USN sorted + blank line after each student) ----------
+document.getElementById('exportBtn').addEventListener('click', () => {
+  showConfirm("Are you sure you want to copy all feedback data to Excel sheet?", async (yes) => {
+    if (!yes) return;
+    try {
+      const querySnapshot = await getDocs(collection(db, "feedbacks"));
+      if (querySnapshot.empty) { alert('No feedback data to export'); return; }
+
+      const excelData = [];
+
+      // Build main data array
+      querySnapshot.forEach(docSnap => {
+        const fb = docSnap.data();
+        const subjects = Array.isArray(fb.subjects) ? fb.subjects : [];
+
+        // Push each subject feedback
+        subjects.forEach(sub => {
+          excelData.push({
+            Name: fb.name || '',
+            USN: fb.usn || '',
+            Email: fb.email || '',
+            Course: fb.course || '',
+            Subject: sub.subject || '',
+            Faculty: sub.faculty || '',
+            Rating: sub.rating || '',
+            Comments: sub.comments || ''
+          });
+        });
+
+        // Add a blank row after this student's feedback
+        excelData.push({
+          Name: '',
+          USN: '',
+          Email: '',
+          Course: '',
+          Subject: '',
+          Faculty: '',
+          Rating: '',
+          Comments: ''
+        });
+      });
+
+      // Sorting by last 3 digits of USN (ascending)
+      function lastDigits(usn) {
+        const m = String(usn || '').match(/(\d{3})$/);
+        return m ? parseInt(m[1], 10) : Number.POSITIVE_INFINITY;
+      }
+
+      // Sort all feedback rows ignoring the blank ones
+      const nonBlank = excelData.filter(r => r.USN && r.USN.trim() !== '');
+      const blanks = excelData.filter(r => !r.USN || r.USN.trim() === '');
+      nonBlank.sort((a, b) => lastDigits(a.USN) - lastDigits(b.USN));
+
+      // Merge sorted data + blank rows (preserving blank row spacing)
+      const finalData = [];
+      let currentUSN = null;
+      nonBlank.forEach(row => {
+        if (row.USN !== currentUSN) {
+          if (currentUSN !== null) {
+            finalData.push({}); // add a blank row separator
+          }
+          currentUSN = row.USN;
+        }
+        finalData.push(row);
+      });
+
+      const worksheet = XLSX.utils.json_to_sheet(finalData, {
+        header: ['Name', 'USN', 'Email', 'Course', 'Subject', 'Faculty', 'Rating', 'Comments']
+      });
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Feedbacks");
+
+      XLSX.writeFile(workbook, "Student_Feedbacks.xlsx");
+    } catch (e) {
+      console.error('Error exporting:', e);
+      alert('Error exporting data: ' + (e && e.message ? e.message : e));
+    }
+  });
+});
+
+
+  
+  async function loadFeedback(){  
+    feedbackContainer.innerHTML='';  
+    try{  
+      const querySnapshot = await getDocs(collection(db,"feedbacks"));  
+      if(querySnapshot.empty){  
+        feedbackContainer.innerHTML='<p>No feedback submitted yet.</p>';  
+        return;  
+      }  
+      let feedbacks = [];
+      querySnapshot.forEach(docSnap => {
+        let data = docSnap.data();
+        feedbacks.push({ id: docSnap.id, ...data });
+      });
+      feedbacks.sort((a,b)=>{
+        let numA = parseInt(a.usn.slice(-3)) || 0;
+        let numB = parseInt(b.usn.slice(-3)) || 0;
+        return numA - numB;
+      });
+      feedbacks.forEach(fb=>{
+        const div = document.createElement('div');  
+        div.className='student-box';  
+        const subjectsHTML = fb.subjects.map(s=>`
+          <tr>
+            <td>${s.subject||'-'}</td>
+            <td>${s.faculty||'-'}</td>
+            <td>${s.rating||'-'}</td>
+            <td>${s.comments||'-'}</td>
+          </tr>`).join('');
+        div.innerHTML=`
+          <button class="delete-btn" data-id="${fb.id}">🗑</button>
+          <h3>👨‍🎓 ${fb.name} | USN: ${fb.usn} | Email: ${fb.email} | Course: ${fb.course}</h3>
+          <table>
+            <thead><tr><th>Subject</th><th>Faculty</th><th>Rating</th><th>Comments</th></tr></thead>
+            <tbody>${subjectsHTML}</tbody>
+          </table>`;
+        feedbackContainer.appendChild(div);
+      });
+      document.querySelectorAll('.delete-btn').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const id = btn.dataset.id;
+          showConfirm("Are you sure you want to delete this student's feedback?", async (yes)=>{
+            if(yes){
+              await deleteDoc(doc(db,"feedbacks",id));
+              loadFeedback();
+            }
+          });
+        });
+      });
+    } catch(e){ console.error('Error fetching feedbacks:', e); feedbackContainer.innerHTML='<p>Error loading feedbacks</p>'; }  
+  }
+});
+
+// Register Service Worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(() => console.log('Service Worker registered successfully.'))
+        .catch(err => console.log('Service Worker registration failed:', err));
+    });
+  }
+
+</script>
+</body>
+</html>

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feedback Results</title>
+
+<!-- PWA / manifest & icons -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2285ff">
+
+<!-- icons -->
+<link rel="icon" href="icon/icon-192.png" sizes="192x192">
+<link rel="apple-touch-icon" href="icon/icon-512.png">
+
+<!-- iOS -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="mobile-web-app-capable" content="yes">
+
+<style>
+
+/* Prevent input zoom on Android keyboard */
+input, select, textarea {
+  font-size: 16px; /* at least 16px stops auto zoom */
+}
+
+  body{
+    margin:0;
+    font-family: "Poppins", "Segoe UI", Arial, sans-serif;
+    background: linear-gradient(135deg,#c9e6ff,#b5fefd);
+    color:#011d33;
+    min-height:100vh;
+    padding:28px;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+  }
+  .card{
+    width:100%;
+    max-width:1000px;
+    background:#fcffec;
+    border-radius:18px;
+    padding:200px 45px;
+    box-shadow:0 15px 30px rgba(0, 0, 0, 0.988);
+    margin-top: 220px;
+  }
+  h1{ text-align:center; margin:0 0 40px 0;margin-bottom: 70px; color:#080808; font-size:52px; }
+  
+  .gradient-text {
+  background: linear-gradient(135deg, #24efe5, #074193, #13b0b8, #0a4091);
+  background-size: 400% 400%;
+  background-clip: text;             /* ✅ standard property added */
+  -webkit-background-clip: text;     /* ✅ for Chrome, Edge, Safari */
+  -webkit-text-fill-color: transparent;
+  animation: gradientFlow 6s ease infinite;
+}
+
+@keyframes gradientFlow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+
+  .summary{ font-weight:800; font-size:23px; font-style:italic; color:#030303; margin-bottom:45px; }
+  table{ width:100%; border-collapse:collapse; border-radius:18px; margin-top:14px; font-size: 26px;font-weight:bold; }
+  th,td{ border:3.3px solid #01060e; padding:18px; text-align:center; }
+  th{ background: linear-gradient(135deg,#85fafe,#6e6ef8); color:#040404; }
+  td{ background:#fcfeff; }
+  .highest{ background:#d4edda; color:#0b5d01; font-weight:750; }
+  .lowest{ background:#f8d7da; color:#fe0202; font-weight:750; }
+  .btn-row{ text-align:center; margin-top:18px; }
+  button{
+    background:linear-gradient(135deg,#71a2d5,#042960);
+    color:#fff;
+    border:0;
+    padding:34px 30px;
+    border-radius:8px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.986);
+    cursor:pointer;
+    font-weight:700;
+    font-size: 23px;
+    margin-top: 70px;
+  }
+  button:hover{ transform:translateY(-4px); }
+  .note{ color:#435f7a; margin-top:8px; font-size:0.95rem; text-align:center; }
+</style>
+</head>
+<body>
+  <div class="card" id="root">
+    <h1><b>📊 <span class="gradient-text"><u>Feedback Analysis & Results</u></span></b><p> </p></h1>
+    <div id="summary" class="summary">Loading results…</div>
+
+    <table aria-describedby="summary">
+      <thead>
+        <tr><th>Faculty Name</th><th>Subject Name</th><th>Average-Rating (out of 5)</th></tr>
+      </thead>
+      <tbody id="resultsBody">
+        <!-- rows inserted here -->
+      </tbody>
+    </table>
+
+    <div class="btn-row">
+      <button id="backBtn">⬅ Back to Admin</button>
+    </div>
+  </div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  // ---------- Use the exact Firebase config you already have in index/admin ----------
+  const firebaseConfig = {
+    apiKey: "AIzaSyCWAu5JS9tMSCVJI0bjHRoXUkxBRcTy6oI",
+    authDomain: "sfm-feedback-system.firebaseapp.com",
+    projectId: "sfm-feedback-system",
+    storageBucket: "sfm-feedback-system.firebasestorage.app",
+    messagingSenderId: "803809181569",
+    appId: "1:803809181569:web:5514c62285e2bb5af6b280",
+    measurementId: "G-D0FG04711S"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // Convert stored rating (label, stars, or numeric string) into number 1..5
+  function parseRating(raw) {
+    if (raw === null || raw === undefined) return 0;
+    if (typeof raw === "number") {
+      const n = Math.max(0, Math.min(5, raw));
+      return n;
+    }
+    const s = String(raw).trim();
+    if (s.length === 0) return 0;
+    // direct numeric
+    const n = Number(s);
+    if (!Number.isNaN(n)) return Math.max(0, Math.min(5, n));
+    const lower = s.toLowerCase();
+    // common word mappings
+    const map = {
+      "poor": 1,
+      "average": 2,
+      "good": 3,
+      "very good": 4,
+      "verygood": 4,
+      "excellent": 5
+    };
+    if (map[lower] !== undefined) return map[lower];
+    // count star-like characters (*,★,⭐)
+    const stars = (s.match(/[*★⭐]/g) || []).length;
+    if (stars > 0) return Math.max(0, Math.min(5, stars));
+    // fallback: look for digit 1-5 inside string
+    const m = s.match(/[1-5]/);
+    if (m) return Number(m[0]);
+    return 0;
+  }
+
+  // Escape HTML to avoid injection when inserting text
+  function escapeHtml(txt) {
+    return String(txt)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  async function showResults() {
+    try {
+      const snap = await getDocs(collection(db, "feedbacks"));
+      if (!snap || snap.empty) {
+        document.getElementById("summary").textContent = "No feedbacks found.";
+        return;
+      }
+
+      // Map keyed by "faculty||subject"
+      const map = new Map();
+      let totalDocs = 0;
+
+      snap.forEach(docSnap => {
+        totalDocs++;
+        const data = docSnap.data();
+        if (!data || !Array.isArray(data.subjects)) return;
+        data.subjects.forEach(entry => {
+          const faculty = (entry.faculty || entry.facultyName || "").toString().trim();
+          const subject = (entry.subject || entry.subjectName || "").toString().trim();
+          const rawRating = entry.rating || entry.ratingLabel || entry.ratingValue || "";
+          if (!faculty && !subject) return;
+          const key = faculty + "||" + subject;
+          if (!map.has(key)) map.set(key, { faculty, subject, total: 0, count: 0 });
+          const ratingNum = parseRating(rawRating);
+          if (ratingNum > 0) {
+            const rec = map.get(key);
+            rec.total += ratingNum;
+            rec.count += 1;
+          }
+        });
+      });
+
+      // Build array of averages
+      const arr = Array.from(map.values()).map(r => {
+        const avg = r.count > 0 ? r.total / r.count : 0;
+        return { faculty: r.faculty, subject: r.subject, avg: Number(avg.toFixed(2)), count: r.count };
+      });
+
+      if (arr.length === 0) {
+        document.getElementById("summary").textContent = "No rated subject entries found in feedbacks.";
+        return;
+      }
+
+      // determine highest and lowest by avg
+      let highest = arr[0];
+      let lowest = arr[0];
+      arr.forEach(item => {
+        if (item.avg > highest.avg) highest = item;
+        if (item.avg < lowest.avg) lowest = item;
+      });
+
+      // update summary
+      const uniqueFaculties = new Set(arr.map(x => x.faculty));
+      const uniqueSubjects = new Set(arr.map(x => x.subject));
+      document.getElementById("summary").innerHTML =
+        "Total feedback submissions: <strong>" + totalDocs + "</strong> | " +
+        "Total faculties: <strong>" + uniqueFaculties.size + "</strong> | " +
+        "Total subjects: <strong>" + uniqueSubjects.size + "</strong> <br>" +
+        "📈🔝 Highest: <strong>" + escapeHtml(highest.faculty) + "</strong> (" + escapeHtml(highest.subject) + ") — " + highest.avg.toFixed(2) + "/5 &nbsp; | &nbsp; " +
+        "📉🔻 Lowest: <strong>" + escapeHtml(lowest.faculty) + "</strong> (" + escapeHtml(lowest.subject) + ") — " + lowest.avg.toFixed(2) + "/5";
+
+      // populate table (sorted descending)
+      arr.sort((a,b) => b.avg - a.avg);
+      const tbody = document.getElementById("resultsBody");
+      tbody.innerHTML = "";
+      arr.forEach(item => {
+        const tr = document.createElement("tr");
+        if (item.faculty === highest.faculty && item.subject === highest.subject) tr.className = "highest";
+        else if (item.faculty === lowest.faculty && item.subject === lowest.subject) tr.className = "lowest";
+        tr.innerHTML =
+          "<td>" + escapeHtml(item.faculty) + "</td>" +
+          "<td>" + escapeHtml(item.subject) + "</td>" +
+          "<td>" + item.avg.toFixed(2) + "</td>";
+        tbody.appendChild(tr);
+      });
+
+    } catch (err) {
+      console.error("Error reading feedbacks:", err);
+      document.getElementById("summary").textContent = "Error loading results. See console.";
+    }
+  }
+
+  // wire back button
+  document.getElementById("backBtn").addEventListener("click", function () {
+    window.location.href = "admin.html";
+  });
+
+  // Run
+  showResults();
+
+  // Register Service Worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(() => console.log('Service Worker registered successfully.'))
+        .catch(err => console.log('Service Worker registration failed:', err));
+    });
+  }
+
+</script>
+</body>
+</html>

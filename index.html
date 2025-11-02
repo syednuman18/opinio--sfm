@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>--SFM--</title>
+
+<!-- PWA / manifest & icons -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2285ff">
+
+<!-- icons -->
+<link rel="icon" href="icon/icon-192.png" sizes="192x192">
+<link rel="apple-touch-icon" href="icon/icon-512.png">
+
+<!-- iOS -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="mobile-web-app-capable" content="yes">
+
+<style>
+
+/* Prevent input zoom on Android keyboard */
+input, select, textarea {
+  font-size: 16px; /* at least 16px stops auto zoom */
+}
+
+/* ---------- Background & Font ---------- */
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: linear-gradient(135deg, #eefe9f 15%, #b7fbfb 87%);
+  margin: 0;
+  padding: 0;
+  color: #0e0d0d;
+}
+
+/* ---------- Header ---------- */
+header {
+  text-align: center;
+  padding: 80px 0;
+  background:linear-gradient(135deg, #abf7f7 10%, #d9fc5a 90%) ;
+  font-size: 65px;
+  font-weight: bold;
+  color:#000;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.986);
+}
+
+header::after {
+  content: "  ";
+}
+
+.gradient-text {
+  background: linear-gradient(45deg, #000, #000, #080808, #378401, #058344, #041977, #630172, #f90874, #a57202, #d513e7, #000, #000, #000);
+  background-size: 400% 400%;
+  background-clip: text;             /* ✅ standard property added */
+  -webkit-background-clip: text;     /* ✅ for Chrome, Edge, Safari */
+  -webkit-text-fill-color: transparent;
+  animation: gradientFlow 9s ease infinite;
+}
+
+@keyframes gradientFlow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+
+
+/* ---------- Container ---------- */
+.container {
+  max-width: 980px;
+  margin: 60px auto;
+  background:#fcfefe;
+  padding: 40px 40px;
+  border-radius: 28px;
+  box-shadow: 0 22px 30px rgba(0, 0, 0, 0.986);
+}
+
+/* ---------- Form Heading ---------- */
+h2 {
+  text-align: center;
+  color: #0a0f4a;
+  font-size: 33px;
+  font-weight: 600;
+  margin-bottom: 30px;
+  border-bottom: 3px solid #5d63ae;
+  padding-bottom: 10px;
+}
+
+h1 {
+  text-align: center;
+  color: #0b0f40;
+  font-size:38px;
+}
+
+h6 {
+  text-align: center;
+  color: #0b0f40;
+  font-size: 34px;
+  font-style: italic;
+}
+
+/* ---------- Input Fields ---------- */
+label {
+  display: block;
+  font-size: 21px;
+  font-style: italic;
+  font-weight: 810;
+  margin-top: 18px;
+  color: #01153b;
+}
+
+input[type="text"],
+input[type="email"],
+textarea {
+  width: 85%;
+  padding: 16px 18px;
+  margin-top: 6px;
+  border: 2.5px solid #0b0171;
+  border-radius: 18px;
+  font-size: 20px;
+  background: #fff;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.986);
+  transition: 0.3s;
+}
+
+input:focus,
+textarea:focus {
+  border-color: #0a0156;
+  background: #eefff3;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.986);
+  outline: none;
+}
+
+textarea {
+  resize: vertical;
+}
+
+/* ---------- Subject Grid ---------- */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 25px;
+  margin-top: 25px;
+}
+
+/* ---------- Subject Box ---------- */
+.box {
+  border: 2px solid #0a0169;
+  border-radius: 16px;
+  padding: 22px;
+  background: linear-gradient(125deg, #dcfaf9, #eeffbf);
+  box-shadow: 0 14px 14px rgba(1, 1, 1, 0.99);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.box:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+}
+
+/* ---------- Stars ---------- */
+.stars {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 45px;
+  cursor: pointer;
+  justify-content: center;
+}
+
+.star {
+  color: #949393;
+  transition: transform 0.2s, color 0.2s;
+}
+
+.star:hover {
+  transform: scale(1.2);
+  transform:translateY(-5px);
+}
+
+.star.selected {
+  color: #FFD700;
+  text-shadow: 0 0 5px #060606;
+}
+
+/* ---------- Rating Text ---------- */
+.rating-text {
+  text-align: center;
+  margin-top: 8px;
+  font-size: 30px;
+  font-weight: 700;
+  color: #020729;
+  font-style: italic;
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-block;
+  margin-top: 25px;
+  padding: 18px 38px;
+  font-size: 26px;
+  border-radius: 8px;
+  box-shadow: 0 13px 22px rgb(5, 5, 5);
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.submit-btn {
+  background: linear-gradient(135deg, #b4faff, #effdab);
+  color: rgb(8, 8, 8);
+}
+
+.submit-btn:hover {
+  transform:translateY(-4px);
+}
+
+.admin-btn {
+  background: linear-gradient(135deg, #646464fa, #070707);
+  color: #f4f7f9;
+  margin-left: 45px;
+}
+
+.admin-btn:hover {
+  transform:translateY(-4px);
+}
+
+/* ---------- Footer ---------- */
+footer {
+  text-align: center;
+  padding: 27px;
+  margin-top: 50px;
+  background: rgb(62, 62, 62);
+  color: #fff;
+  font-size: 20px;
+  font-weight: 650;
+  font-style: italic;
+  box-shadow: 0 -2px 8px rgba(6, 6, 6, 0.995);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 800px) {
+  header { font-size: 40px; }
+  h2 { font-size: 30px; }
+  .btn { width: 100%; margin-top: 15px; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <span class="gradient-text"><b>OPINIO</b> – Feedback Management App</span>
+</header>
+
+
+
+<div class="container">
+
+  <h1>---------------   <i><b>Feedback Form 🗒</b></i>     ---------------</h1><p> </p>
+  <h2><i>Your feedback helps to improve teaching quality 📈💯</i></h2>
+  <form id="feedbackForm">
+    <label>Student Name :</label>
+    <input type="text" id="name" placeholder="Enter your name..." required>
+
+    <label>Student Email ID :</label>
+    <input type="email" id="email" placeholder="Enter your Email id..." required>
+
+    <label>Student USN :</label>
+    <input type="text" id="usn" placeholder="Enter 10-character USN (last 3 must be numbers)..." required>
+
+    <label>Course-[Department Name] :</label>
+    <input type="text" id="course" placeholder="Enter your course name..." required>
+
+    <h6><span class="gradient-text"> Faculty Feedback Ratings</span></h6>
+
+    <div class="grid">
+      <!-- 9 Subject Boxes -->
+      <!-- Use JS to handle stars and ratings -->
+      <script>
+        const subjects = Array.from({length:9},(_,i)=>i+1);
+        document.write(subjects.map(i=>`
+          <div class="box">
+            <label>Subject ${i} Name :</label>
+            <input type="text" id="subject${i}"readonly>
+            <label>Faculty Name :</label>
+            <input type="text" id="faculty${i}"readonly>
+            <h3></br><b><i>Feedback Ratings</i></b></h3>
+            <div class="stars" data-rating="${i}">
+              <span class="star" data-value="1">&#9733;</span>
+              <span class="star" data-value="2">&#9733;</span>
+              <span class="star" data-value="3">&#9733;</span>
+              <span class="star" data-value="4">&#9733;</span>
+              <span class="star" data-value="5">&#9733;</span>
+            </div>
+            <div class="rating-text" id="ratingText${i}"></div>
+            <label>Additional Comments :</label>
+            <textarea id="comments${i}" rows="3"></textarea>
+          </div>`).join(''));
+      </script>
+      <p> </p>
+    </div>
+
+  
+
+    <button type="submit" class="btn submit-btn">Submit Feedback ✅</button>
+    <button type="submit" class="btn admin-btn" id="signOutBtn">Sign Out</button>
+    <button type="button" class="btn admin-btn" id="adminBtn">Admin Panel 🔒</button>
+
+  </form>
+</div>
+
+<footer><b>OPINIO</b></br>_(SFM--Student Feedback Management App)_</br>  &copy <i><b>Syed Numan Pasha</b></i></footer>
+
+<!-- Firebase Script -->
+<!-- Firebase Script -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc, query, where, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCWAu5JS9tMSCVJI0bjHRoXUkxBRcTy6oI",
+  authDomain: "sfm-feedback-system.firebaseapp.com",
+  projectId: "sfm-feedback-system",
+  storageBucket: "sfm-feedback-system.firebasestorage.app",
+  messagingSenderId: "803809181569",
+  appId: "1:803809181569:web:5514c62285e2bb5af6b280",
+  measurementId: "G-D0FG04711S"
+};
+
+const app = initializeApp(firebaseConfig);
+getAnalytics(app);
+const db = getFirestore(app);
+
+import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+const auth = getAuth();
+document.getElementById('signOutBtn').addEventListener('click', async ()=>{
+  await signOut(auth);
+  window.location.href = 'signup.html';
+});
+
+
+/* -------------------------------------------------------------
+   Fetch subject & faculty lists from Firestore and fill the 9 boxes
+------------------------------------------------------------- */
+async function fillLists() {
+  try {
+    const ref = doc(db, "lists", "data");
+    const snap = await getDoc(ref);
+    if (snap.exists()) {
+      const data = snap.data();
+      const subs = data.subjects || [];
+      const facs = data.faculty || [];
+
+      for (let i = 1; i <= 9; i++) {
+        const s = document.getElementById("subject" + i);
+        const f = document.getElementById("faculty" + i);
+        if (s) s.value = subs[i - 1] || "";
+        if (f) f.value = facs[i - 1] || "";
+      }
+    }
+  } catch (err) {
+    console.error("Error loading lists:", err);
+  }
+}
+
+
+/* -------------------------------------------------------------
+   Main Page Logic
+------------------------------------------------------------- */
+document.addEventListener("DOMContentLoaded", () => {
+  // --- Fill subject/faculty lists first ---
+  fillLists();
+
+  const ratingLabels = {1: "Poor", 2: "Average", 3: "Good", 4: "Very Good", 5: "Excellent"};
+
+  // Handle stars
+  document.querySelectorAll(".stars").forEach((starsDiv, idx) => {
+    const stars = Array.from(starsDiv.querySelectorAll(".star"));
+    const ratingText = document.getElementById("ratingText" + (idx + 1));
+    let selectedRating = 0;
+
+    stars.forEach(star => {
+      star.addEventListener("click", () => {
+        const value = parseInt(star.dataset.value);
+        if (selectedRating === value) {
+          selectedRating = 0;
+          stars.forEach(s => s.classList.remove("selected"));
+          ratingText.textContent = "";
+        } else {
+          selectedRating = value;
+          stars.forEach(s => s.classList.remove("selected"));
+          for (let i = 0; i < value; i++) stars[i].classList.add("selected");
+          ratingText.textContent = ratingLabels[value];
+        }
+        starsDiv.dataset.selected = selectedRating;
+      });
+    });
+
+    starsDiv.dataset.selected = 0;
+  });
+
+  // Admin button
+  document.getElementById("adminBtn").addEventListener("click", () => {
+    window.location.href = "admin.html";
+  });
+
+  // Form submit
+  document.getElementById("feedbackForm").addEventListener("submit", async e => {
+    e.preventDefault();
+
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const usn = document.getElementById("usn").value.trim();
+    const course = document.getElementById("course").value.trim();
+
+    if (usn.length !== 10) {
+      alert("USN must be exactly 10 characters.");
+      return;
+    }
+    if (!/^[A-Za-z0-9]{7}[0-9]{3}$/.test(usn)) {
+      alert("Last 3 characters of USN must be numbers.");
+      return;
+    }
+
+    const q = query(collection(db, "feedbacks"), where("usn", "==", usn));
+    const snapshot = await getDocs(q);
+    if (!snapshot.empty) {
+      alert("This USN has already submitted feedback!");
+      return;
+    }
+
+    let subjects = [], filled = false;
+    for (let i = 1; i <= 9; i++) {
+      const sub = document.getElementById("subject" + i).value.trim();
+      const fac = document.getElementById("faculty" + i).value.trim();
+      const comments = document.getElementById("comments" + i).value.trim();
+      const rating = parseInt(document.querySelector(".stars[data-rating='" + i + "']").dataset.selected) || 0;
+      const ratingLabel = rating ? ratingLabels[rating] : "";
+      if (sub || fac || rating || comments) filled = true;
+      subjects.push({ subject: sub, faculty: fac, rating: ratingLabel, comments });
+    }
+
+    if (!filled) {
+      alert("Please fill feedback for at least one subject.");
+      return;
+    }
+
+    try {
+      await addDoc(collection(db, "feedbacks"), {
+        name,
+        email,
+        usn,
+        course,
+        subjects,
+        timestamp: new Date()
+      });
+      alert("✅ Feedback submitted successfully!");
+      document.getElementById("feedbackForm").reset();
+      document.querySelectorAll(".star").forEach(s => s.classList.remove("selected"));
+      document.querySelectorAll(".rating-text").forEach(t => t.textContent = "");
+      document.querySelectorAll(".stars").forEach(div => div.dataset.selected = "0");
+    } catch (error) {
+      console.error("Error adding document: ", error);
+      alert("❌ Error submitting feedback. Please try again.");
+    }
+  });
+});
+
+// Register Service Worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(() => console.log('Service Worker registered successfully.'))
+        .catch(err => console.log('Service Worker registration failed:', err));
+    });
+  }
+
+</script>
+</body>
+</html>

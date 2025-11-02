@@ -1,0 +1,27 @@
+{
+  "name": "OPINIO",
+  "short_name": "OPINIO",
+  "id": "/opinio--sfm/signup.html",
+  "start_url": "https://syednuman18.github.io/opinio--sfm/",
+  "scope": "https://syednuman18.github.io/opinio--sfm/",
+
+  "description": "OPINIO---Feedback Management System App",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon/icon-192.png",
+      "sizes": "192x188",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon/icon-512.png",
+      "sizes": "512x768",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
